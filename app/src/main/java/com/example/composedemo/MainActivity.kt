@@ -2,33 +2,52 @@ package com.example.composedemo
 
 import android.os.Bundle
 import android.widget.CheckBox
+import android.widget.Toast
 import androidx.compose.material3.Checkbox
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +62,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphStyle
@@ -56,7 +76,10 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composedemo.ui.theme.data.BoxProperties
+import com.example.composedemo.ui.theme.data.ItemProperties
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +88,166 @@ class MainActivity : ComponentActivity() {
             MainScreen()
         }
     }
+}
+
+@Composable
+fun GridItem(properties: BoxProperties) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .width(properties.width)
+            .clip(RoundedCornerShape(0.dp))
+            .background(properties.color)
+    )
+}
+
+@Composable
+fun CoverPager() {
+
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun StaggeredPreview() {
+    val items = (1..50).map {
+        BoxProperties(
+            height = Random.nextInt(50,200).dp,
+            width = Random.nextInt(50,200).dp,
+            color = Color(
+                Random.nextInt(255),
+                Random.nextInt(255),
+                Random.nextInt(255),
+                255
+            )
+        )
+    }
+    LazyHorizontalStaggeredGrid(
+        rows = StaggeredGridCells.Fixed(3),
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(items) { boxProperties ->
+            GridItem(properties = boxProperties)
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun Cars(cars: Array<out String>) {
+    val context = LocalContext.current
+    val groupCars = cars.groupBy { it.substringBefore(' ') }
+    val onCarItemClick = {text: String ->
+        Toast.makeText(
+            context,
+            text,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+    val displayButton = remember {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 5
+        }
+    }
+
+    Box {
+        LazyColumn(
+            state = listState,
+            contentPadding = PaddingValues(bottom = 50.dp)
+        ) {
+            groupCars.forEach { (manufacture, models) ->
+                stickyHeader {
+                    Text(
+                        text = manufacture,
+                        color = Color.White,
+                        modifier = Modifier
+                            .background(Color.Gray)
+                            .padding(5.dp)
+                            .fillMaxWidth()
+                    )
+                }
+                items(models) { model ->
+                    CarListItem(item = model, onCarItemClick)
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = displayButton.value,
+            Modifier.align(Alignment.BottomCenter)
+        ) {
+            OutlinedButton(
+                onClick = {
+                    coroutineScope.launch {
+                        listState.animateScrollToItem(0)
+                    }
+                },
+                border = BorderStroke(1.dp,Color.Gray),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color.DarkGray
+                ),
+                modifier = Modifier.padding(5.dp)
+            ) {
+                Text(text = "Top")
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ItemPreview() {
+    CarListItem(item = "Buick Roadmaster") {}
+}
+
+@Composable
+fun CarListItem(
+    item: String,
+    onCarItemClick: (String) -> Unit
+) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCarItemClick(item) }
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp)
+        ) {
+            ImageLoader(item = item)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                item,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ImageLoader(item: String) {
+    val url =
+        "https://www.ebookfrenzy.com/book_examples/car_logos/" + item.substringBefore(" ") +
+                "_logo.png"
+    Image(
+        painter = painterResource(id = R.drawable.girl),
+        contentDescription = "car image",
+        contentScale = ContentScale.Fit,
+        modifier = Modifier
+            .clip(shape = RoundedCornerShape(10.dp))
+            .size(75.dp)
+    )
 }
 
 @Composable
@@ -137,7 +320,7 @@ fun ScreenContent(
         Image(
             contentScale = ContentScale.Fit,
             contentDescription = "",
-            painter = painterResource(id = R.drawable.ic_launcher_background),
+            painter = painterResource(id = R.drawable.girl),
             modifier = Modifier
                 .padding(16.dp)
                 .clip(shape = RoundedCornerShape(10.dp))
@@ -216,12 +399,6 @@ fun CheckBoxes(
         )
     }
 }
-
-data class ItemProperties(
-    val color: Color,
-    val width: Dp,
-    val height: Dp,
-)
 
 @Composable
 fun ColumnList() {
