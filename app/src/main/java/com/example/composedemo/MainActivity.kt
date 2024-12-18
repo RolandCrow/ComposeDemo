@@ -1,12 +1,23 @@
 package com.example.composedemo
 
 import android.os.Bundle
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.compose.material3.Checkbox
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animation
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -56,6 +67,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -76,8 +88,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.composedemo.ui.theme.data.BoxColor
 import com.example.composedemo.ui.theme.data.BoxProperties
-import com.example.composedemo.ui.theme.data.ItemProperties
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -87,6 +99,164 @@ class MainActivity : ComponentActivity() {
         setContent {
             MainScreen()
         }
+    }
+}
+
+@Composable
+fun ColorChangeDemo() {
+    var colorState by remember {
+        mutableStateOf(BoxColor.Red)
+    }
+
+    val animatedColor by animateColorAsState(
+        targetValue = when(colorState) {
+            BoxColor.Red -> Color.Magenta
+            BoxColor.Magenta -> Color.Red
+        },
+        animationSpec = tween(4500),
+        label = "Color Change"
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .padding(20.dp)
+                .size(200.dp)
+                .background(animatedColor)
+        )
+
+        Button(
+            onClick = {
+                colorState = when(colorState) {
+                    BoxColor.Red -> BoxColor.Magenta
+                    BoxColor.Magenta -> BoxColor.Red
+                }
+            },
+            modifier = Modifier
+                .padding(10.dp)
+        ) {
+            Text(text = "Change Color")
+        }
+    }
+}
+
+@Composable
+fun RotationDemo() {
+    var rotated by remember {
+        mutableStateOf(false)
+    }
+
+    val angle by animateFloatAsState(
+        targetValue = if(rotated) 360f else 0f,
+        animationSpec = tween(durationMillis = 2500, easing = LinearEasing),
+        label = "Rotate"
+    )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.typescript),
+            contentDescription = "fan",
+            modifier = Modifier
+                .rotate(angle)
+                .padding(10.dp)
+                .size(300.dp)
+        )
+
+        Button(
+            onClick = {rotated = !rotated},
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(text = "Rotate Propeller")
+        }
+    }
+}
+
+@Composable
+fun RotationPreview() {
+    RotationDemo()
+    ColorChangeDemo()
+}
+
+@Composable
+fun AnimationVisibilityPreview() {
+    var boxVisible by remember {
+        mutableStateOf(true)
+    }
+
+    val onClick = { newState: Boolean ->
+        boxVisible = newState
+    }
+
+    val state = remember {
+        MutableTransitionState(false)
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Crossfade(
+                targetState = boxVisible,
+                animationSpec = tween(5000),
+                label = "crossFade"
+            ) { visible ->
+                when(visible) {
+                    true -> CustomButton(
+                        text = "Hide",
+                        targetState = false,
+                        onClick = onClick,
+                        bgColor = Color.Red
+                    )
+                    else -> CustomButton(
+                        text = "Show",
+                        targetState = true,
+                        onClick = onClick,
+                        bgColor = Color.Magenta
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        AnimatedVisibility(
+            visible = boxVisible,
+            enter = fadeIn(animationSpec = tween(durationMillis = 5000)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 5000)) +
+                    shrinkVertically(animationSpec = tween(durationMillis = 5000)),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(height = 200.dp, width = 200.dp)
+                    .background(Color.Blue)
+            )
+        }
+    }
+}
+
+@Composable
+fun CustomButton(
+    text: String,
+    targetState: Boolean,
+    onClick: (Boolean) -> Unit,
+    bgColor: Color = Color.Blue
+) {
+    Button(
+        onClick = {onClick(targetState)},
+        colors = ButtonDefaults.buttonColors(
+            containerColor = bgColor,
+            contentColor = Color.White
+        )
+    ) {
+        Text(text = text)
     }
 }
 
