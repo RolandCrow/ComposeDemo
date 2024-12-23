@@ -9,12 +9,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Animation
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
@@ -33,6 +36,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -74,6 +78,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -89,7 +94,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composedemo.ui.theme.data.BoxColor
+import com.example.composedemo.ui.theme.data.BoxPosition
 import com.example.composedemo.ui.theme.data.BoxProperties
+import com.example.composedemo.ui.theme.data.Phone
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -98,6 +105,141 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MainScreen()
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun Phones(phones: List<Phone>) {
+    val groupedPhones = phones.groupBy { phone ->
+        phone.company
+    }
+
+    Box {
+        LazyColumn(
+            state = rememberLazyListState()
+        ) {
+            groupedPhones.forEach { (company,models) ->
+                stickyHeader {
+                    Text(
+                        text = company,
+                        color = Color.White,
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.secondary)
+                            .fillMaxSize()
+                            .padding(10.dp)
+                    )
+                }
+
+                items(models) { phone ->
+                    PhoneItem(phone = phone)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PhoneItem(phone: Phone) {
+    Card(
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        modifier = Modifier.padding(10.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.baseline_phone_android_24),
+                contentDescription = phone.name,
+                modifier = Modifier.size(50.dp)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Column {
+                Text(
+                    text = phone.company,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                Text(
+                    text = phone.model
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PhonesPreview() {
+    val phones = listOf("Apple iPhone 12", "Google Pixel 4", "Google Pixel 6",
+        "Samsung Galaxy 6s", "Apple iPhone 7", "OnePlus 7", "OnePlus 9 Pro",
+        "Apple iPhone 13", "Samsung Galaxy Z Flip", "Google Pixel 4a",
+        "Apple iPhone 8")
+
+    Phones(phones = phones.map { Phone(it) })
+}
+
+@Composable
+fun MotionDemo() {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val boxSideLength = 70.dp
+    var boxState by remember {
+        mutableStateOf(BoxPosition.Start)
+    }
+    val transition = updateTransition(
+        targetState = boxState,
+        label = "Color and Motion"
+    )
+    val animatedColor: Color by transition.animateColor(
+        transitionSpec = {
+            tween(4000)
+        },
+        label = "colorAnimation"
+    ) { state ->
+        when(state) {
+            BoxPosition.Start -> Color.Red
+            BoxPosition.End -> Color.Magenta
+        }
+    }
+
+    val animatedOffset: Dp by transition.animateDp(
+        transitionSpec = {
+            tween(4000)
+        },
+        label = "offsetAnimation"
+    ) { state ->
+        when(state) {
+            BoxPosition.Start -> 0.dp
+            BoxPosition.End -> screenWidth - boxSideLength
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(
+            modifier = Modifier
+                .offset(x = animatedOffset, y = 20.dp)
+                .size(boxSideLength)
+                .background(animatedColor)
+        )
+        Spacer(modifier = Modifier.height(50.dp))
+
+        Button(
+            onClick = {
+                boxState = when(boxState) {
+                    BoxPosition.Start -> BoxPosition.End
+                    BoxPosition.End -> BoxPosition.Start
+                }
+            },
+            modifier = Modifier
+                .padding(20.dp)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(text = "Move Box")
         }
     }
 }
@@ -178,6 +320,7 @@ fun RotationDemo() {
 
 @Composable
 fun RotationPreview() {
+    MotionDemo()
     RotationDemo()
     ColorChangeDemo()
 }
