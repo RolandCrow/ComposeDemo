@@ -1,4 +1,4 @@
-package com.example.composedemo.ui.theme.data
+package com.example.composedemo.data
 
 class Phone(
     var name: String

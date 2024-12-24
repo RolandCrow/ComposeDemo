@@ -1,10 +1,10 @@
-package com.example.composedemo.ui.theme.data
+package com.example.composedemo.data
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 
-data class BoxProperties(
+data class ItemProperties(
     val color: Color,
-    val height: Dp,
     val width: Dp,
+    val height: Dp,
 )

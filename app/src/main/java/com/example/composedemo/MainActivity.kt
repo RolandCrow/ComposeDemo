@@ -1,8 +1,6 @@
 package com.example.composedemo
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.CheckBox
 import android.widget.Toast
 import androidx.compose.material3.Checkbox
 import androidx.activity.ComponentActivity
@@ -11,11 +9,15 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animation
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Spring.DampingRatioHighBouncy
+import androidx.compose.animation.core.Spring.StiffnessVeryLow
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
@@ -33,6 +35,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -67,12 +70,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -90,23 +93,177 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.composedemo.ui.theme.data.BoxColor
-import com.example.composedemo.ui.theme.data.BoxPosition
-import com.example.composedemo.ui.theme.data.BoxProperties
-import com.example.composedemo.ui.theme.data.Phone
+import com.example.composedemo.data.BoxColor
+import com.example.composedemo.data.BoxPosition
+import com.example.composedemo.data.BoxProperties
+import com.example.composedemo.data.Phone
+import com.example.composedemo.ui.theme.ComposeDemoTheme
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
+    private var itemArray: Array<String>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        itemArray = resources.getStringArray(R.drawable.car_list)
         setContent {
-            MainScreen()
+            ComposeDemoTheme {
+                MainScreen()
+                CarouselPreview()
+                ItemPreview()
+                Cars(cars = itemArray as Array<out String>)
+                StaggeredPreview()
+                AnimationVisibilityPreview()
+                RotationPreview()
+                PhonesPreview()
+            }
         }
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun AnimationLab() {
+    val screenHeight = LocalConfiguration.current.screenWidthDp.dp
+    var currentImage by remember {
+        mutableStateOf(0)
+    }
+    AnimatedVisibility(
+        visible = currentImage == 0,
+        enter = fadeIn(tween(1000)),
+        exit = fadeOut(tween(5000))
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.girl),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable {
+                    currentImage = 1
+                },
+            contentScale = ContentScale.Crop
+        )
+    }
+    AnimatedVisibility(
+        visible = currentImage == 1,
+        enter = fadeIn(tween(5000), 0.6f)
+    ) {
+        var state by remember {
+            mutableStateOf(false)
+        }
+
+        val animatedOffset: Dp by animateDpAsState(
+            targetValue = if(state) 0.dp else screenHeight,
+            animationSpec = spring(
+                dampingRatio = DampingRatioHighBouncy,
+                stiffness = StiffnessVeryLow
+            ), label = ""
+        )
+        state = true
+        
+        Box(
+            modifier = Modifier
+                .offset(y = animatedOffset)
+                .background(Color(0, 0, 80, 255))
+                .clickable {
+                    currentImage = 0
+                    state = false
+                }
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ) {
+                Text(
+                    text = "Hello",
+                    color = Color.White,
+                    fontSize = 80.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CarouselPreview() {
+    Carousel {
+        ('a'..'f').map { letter ->
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.inversePrimary)
+                    .fillMaxWidth()
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                ) {
+                    Text(
+                        text = letter.uppercase(),
+                        fontSize = 80.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun Carousel(
+    modifier: Modifier = Modifier,
+    showIndicators: Boolean = true,
+    carouselItems: @Composable () -> Unit,
+) {
+    var currentCarouselItem by rememberSaveable {
+        mutableStateOf(2)
+    }
+    val animatedCurrentCarouselItem = animateIntAsState(
+        targetValue = currentCarouselItem,
+        animationSpec = tween(500), label = ""
+    )
+
+    Column {
+        Button(
+            onClick = {
+                currentCarouselItem = (currentCarouselItem + 1) % 6
+            }
+        ) {
+            Text(text = "Next")
+        }
+
+        Box(
+            modifier = Modifier
+        ) {
+            Layout(
+                modifier = modifier,
+                content = carouselItems
+            ) { measurable, constraints ->
+                val placeableCarouselItems = measurable.map {
+                    measureableCarouselItem -> measureableCarouselItem.measure(constraints) }
+                val measureResult = layout(constraints.maxWidth, constraints.maxHeight) {
+                    if(placeableCarouselItems.isNotEmpty()) {
+                        placeableCarouselItems[animatedCurrentCarouselItem.value].placeRelative(
+                            0,0
+                        )
+                    }
+                }
+                measureResult
+            }
+        }
+    }
+
 }
 
 @OptIn(ExperimentalFoundationApi::class)
