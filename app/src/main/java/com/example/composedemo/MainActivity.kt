@@ -110,17 +110,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        itemArray = resources.getStringArray(R.drawable.car_list)
+        itemArray = resources.getStringArray(R.array.car_list)
         setContent {
             ComposeDemoTheme {
-                MainScreen()
-                CarouselPreview()
-                ItemPreview()
-                Cars(cars = itemArray as Array<out String>)
-                StaggeredPreview()
-                AnimationVisibilityPreview()
-                RotationPreview()
-                PhonesPreview()
+                    MainScreen()
+                    CarouselPreview()
+                    ItemPreview()
+                    Cars(cars = itemArray as Array<out String>)
+                    StaggeredPreview()
+                    AnimationVisibilityPreview()
+                    RotationPreview()
+                    PhonesPreview()
             }
         }
     }
