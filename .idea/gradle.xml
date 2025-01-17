@@ -11,6 +11,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/boxlayout" />
+            <option value="$PROJECT_DIR$/constraintlayoutcompose" />
+            <option value="$PROJECT_DIR$/coroutines_compose" />
             <option value="$PROJECT_DIR$/customlayout" />
             <option value="$PROJECT_DIR$/rowcolumn" />
           </set>
