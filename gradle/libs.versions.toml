@@ -3,6 +3,7 @@ activityComposeVersion = "1.5.1"
 agp = "8.5.0"
 androidxComposeBom = "2024.11.00"
 androidxJunit = "1.1.5"
+coilCompose = "2.4.0"
 composeBomVersion = "2022.10.00"
 coreKtxVersion = "1.8.0"
 espressoCoreVersion = "3.5.1"
@@ -29,6 +30,7 @@ androidx-core-ktx-v180 = { module = "androidx.core:core-ktx", version.ref = "cor
 androidx-espresso-core-v351 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
 androidx-junit-v115 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-lifecycle-runtime-ktx-v231 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
