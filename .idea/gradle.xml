@@ -11,11 +11,13 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/boxlayout" />
+            <option value="$PROJECT_DIR$/compose_animations" />
             <option value="$PROJECT_DIR$/constraintlayoutcompose" />
             <option value="$PROJECT_DIR$/coroutines_compose" />
             <option value="$PROJECT_DIR$/customlayout" />
             <option value="$PROJECT_DIR$/lazy_list" />
             <option value="$PROJECT_DIR$/rowcolumn" />
+            <option value="$PROJECT_DIR$/staggered_grid" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />
