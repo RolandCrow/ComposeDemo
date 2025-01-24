@@ -5,10 +5,10 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#GRADLE_LOCAL_JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/animation_state" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/boxlayout" />
             <option value="$PROJECT_DIR$/compose_animations" />
@@ -20,7 +20,6 @@
             <option value="$PROJECT_DIR$/staggered_grid" />
           </set>
         </option>
-        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
