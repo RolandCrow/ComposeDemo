@@ -13,6 +13,7 @@
             <option value="$PROJECT_DIR$/boxlayout" />
             <option value="$PROJECT_DIR$/compose_animations" />
             <option value="$PROJECT_DIR$/compose_canvas" />
+            <option value="$PROJECT_DIR$/compose_room" />
             <option value="$PROJECT_DIR$/compose_view_models" />
             <option value="$PROJECT_DIR$/constraintlayoutcompose" />
             <option value="$PROJECT_DIR$/coroutines_compose" />
