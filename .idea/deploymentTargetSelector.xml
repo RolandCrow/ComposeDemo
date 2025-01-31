@@ -38,9 +38,6 @@
       <SelectionState runConfigName="animation_state">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="MainActivity (2)">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="compose_canvas">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2025-01-27T11:48:33.728340Z">
@@ -65,6 +62,15 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="MainActivity">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="compose_navigation">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="MainActivity (4)">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="compose_navbar">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
