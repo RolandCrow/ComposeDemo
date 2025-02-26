@@ -4,7 +4,9 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="testRunner" value="CHOOSE_PER_TEST" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="corretto-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -13,6 +15,7 @@
             <option value="$PROJECT_DIR$/boxlayout" />
             <option value="$PROJECT_DIR$/compose_animations" />
             <option value="$PROJECT_DIR$/compose_canvas" />
+            <option value="$PROJECT_DIR$/compose_gestures" />
             <option value="$PROJECT_DIR$/compose_navbar" />
             <option value="$PROJECT_DIR$/compose_navigation" />
             <option value="$PROJECT_DIR$/compose_room" />
@@ -25,6 +28,7 @@
             <option value="$PROJECT_DIR$/staggered_grid" />
           </set>
         </option>
+        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>
