@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/boxlayout" />
             <option value="$PROJECT_DIR$/compose_animations" />
             <option value="$PROJECT_DIR$/compose_canvas" />
+            <option value="$PROJECT_DIR$/compose_flow" />
             <option value="$PROJECT_DIR$/compose_gestures" />
             <option value="$PROJECT_DIR$/compose_navbar" />
             <option value="$PROJECT_DIR$/compose_navigation" />
